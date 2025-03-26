@@ -51,9 +51,12 @@ jobs:
           newman run ./postman_collection.json \
             -e ./postman_environment.json \
             --reporters cli,html \
-            --reporter-html-export results/postman-report.html
+            --reporter-html-export results/postman-report.html || EXIT_CODE=$?
+          echo "Newman Exit Code: $EXIT_CODE"
+          exit $EXIT_CODE  # Ensures failure is logged but report is generated
 
       - name: Upload Postman Test Report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: postman-test-report
