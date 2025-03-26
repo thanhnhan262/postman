@@ -34,10 +34,22 @@ jobs:
       - name: Install Newman
         run: npm install -g newman newman-reporter-html
 
+      - name: Get Latest Postman Collection
+        run: |
+          curl --location "https://api.getpostman.com/collections/4321044-a14be363-4217-4fe2-9b52-2bc7e8e385c1" \
+            --header "X-Api-Key: ${{ secrets.POSTMAN_API_KEY }}" \
+            --output test/postman_collection.json
+      
+      - name: Get Latest Postman Environment
+        run: |
+          curl --location "https://api.getpostman.com/environments/4321044-dace7482-9337-497c-bcd4-2b52a4af1f31" \
+            --header "X-Api-Key: ${{ secrets.POSTMAN_API_KEY }}" \
+            --output test/postman_environment.json
+
       - name: Run Postman Tests
         run: |
-          newman run ./test/bondaracademy.postman_collection.json \
-            -e ./test/bonda.postman_environment.json \
+          newman run ./test/postman_collection.json \
+            -e ./test/postman_environment.json \
             --reporters cli,html \
             --reporter-html-export results/postman-report.html
 
