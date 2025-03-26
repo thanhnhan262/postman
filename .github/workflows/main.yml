@@ -1,0 +1,48 @@
+name: Deploy and Run Postman Tests
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to main branch
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Deploy Application
+        run: |
+          echo "Simulating deployment..."
+          sleep 10  # Replace with actual deployment commands
+          echo "Deployment completed"
+
+  postman-test:
+    needs: deploy  # Run after deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-html
+
+      - name: Run Postman Tests
+        run: |
+          newman run ./test/postman_collection.json \
+            -e ./test/postman_environment.json \
+            --reporters cli,html \
+            --reporter-html-export results/postman-report.html
+
+      - name: Upload Postman Test Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: postman-test-report
+          path: results/postman-report.html
